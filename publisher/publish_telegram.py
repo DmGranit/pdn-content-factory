@@ -14,9 +14,12 @@ import json, os, sys, uuid, subprocess, urllib.request, urllib.parse
 # Источники токена (по порядку): опциональный секрет-брокер (env CF_VAULT = путь к
 # PowerShell-скрипту с командой `get <id>`, напр. DPAPI-сейф) -> .env в корне проекта.
 # Значение нигде не печатается; строка [secret] в stderr показывает только ИСТОЧНИК.
-VAULT = os.environ.get("CF_VAULT", "")
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
+sys.path.insert(0, ROOT)
+import cf_env  # noqa: F401  — .env проекта -> окружение (в т.ч. CF_VAULT)
+
+VAULT = os.environ.get("CF_VAULT", "")
 
 
 def load_vault(secret_id, env_name):
