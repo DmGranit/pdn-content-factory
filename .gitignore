@@ -1,0 +1,16 @@
+# --- runtime завода (продукция и следы прогонов — не исходники) ---
+_STATUS.md
+_audit.md
+_machine/
+drafts/
+published/
+rejected/
+STOP
+
+# --- секреты и машинно-локальные настройки ---
+.env
+local.bat
+
+# --- python ---
+__pycache__/
+*.pyc

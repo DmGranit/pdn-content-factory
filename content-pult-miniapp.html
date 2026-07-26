@@ -1,0 +1,455 @@
+<title>Пульт контента · @pdn152fz_check</title>
+<style>
+  :root{
+    --bg:#0a0d16; --bg-deep:#06080f; --panel:#121728; --panel-2:#0e1220; --well:#0b0e19;
+    --line:#232a42; --line-soft:#1a2036;
+    --ink:#e8ecf7; --ink-dim:#8b93b0; --ink-faint:#5b6486;
+    --cyan:#2fe4ff; --violet:#8b7bff; --magenta:#ff5cc8;
+    --lime:#7dffb0; --amber:#ffcf6b; --red:#ff6b8a;
+    --mono:ui-monospace,"Cascadia Code","JetBrains Mono","SFMono-Regular",Consolas,monospace;
+    --sans:-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+    --r:16px; --r-sm:10px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(900px 500px at 50% -10%, rgba(139,123,255,.16), transparent 60%),
+      radial-gradient(700px 500px at 110% 20%, rgba(255,92,200,.10), transparent 55%),
+      var(--bg-deep);
+    color:var(--ink); font-family:var(--sans); font-size:15px; line-height:1.5;
+    -webkit-font-smoothing:antialiased; min-height:100vh;
+    display:flex; justify-content:center; padding:22px 14px 40px;
+  }
+  .device{
+    width:100%; max-width:452px; background:var(--bg);
+    border:1px solid var(--line); border-radius:26px; overflow:hidden;
+    box-shadow:0 30px 80px -30px rgba(0,0,0,.9), 0 0 0 1px rgba(139,123,255,.06);
+    display:flex; flex-direction:column; position:relative;
+  }
+
+  /* ---------- header ---------- */
+  .top{
+    padding:16px 18px 13px; position:sticky; top:0; z-index:6;
+    background:linear-gradient(180deg, #0c1120 0%, rgba(12,17,32,.92) 100%);
+    border-bottom:1px solid var(--line-soft); backdrop-filter:blur(8px);
+  }
+  .brand{display:flex; align-items:center; gap:10px}
+  .logo{
+    width:34px; height:34px; border-radius:10px; flex:none; display:grid; place-items:center;
+    font-size:18px; background:linear-gradient(145deg, rgba(47,228,255,.18), rgba(255,92,200,.18));
+    border:1px solid rgba(47,228,255,.35);
+  }
+  .brand h1{
+    font-family:var(--mono); font-size:14px; letter-spacing:.14em; text-transform:uppercase;
+    margin:0; font-weight:700; color:var(--ink);
+  }
+  .brand .chan{font-family:var(--mono); font-size:11.5px; color:var(--cyan); letter-spacing:.02em}
+  .live{
+    margin-left:auto; display:inline-flex; align-items:center; gap:6px; font-family:var(--mono);
+    font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--lime);
+    padding:4px 9px; border:1px solid rgba(125,255,176,.3); border-radius:999px; background:rgba(125,255,176,.06);
+  }
+  .live .dot{width:6px;height:6px;border-radius:50%;background:var(--lime);box-shadow:0 0 8px var(--lime);animation:pulse 2.4s ease-in-out infinite}
+  .proto{
+    margin-top:11px; display:flex; align-items:center; gap:8px; font-family:var(--mono);
+    font-size:10.5px; letter-spacing:.03em; color:var(--amber);
+    background:rgba(255,207,107,.07); border:1px solid rgba(255,207,107,.24);
+    border-radius:8px; padding:6px 10px;
+  }
+  .proto b{color:var(--amber);font-weight:700;letter-spacing:.12em}
+
+  /* ---------- tabs ---------- */
+  .tabs{
+    display:flex; gap:4px; padding:8px 10px; position:sticky; top:0; z-index:5;
+    background:var(--bg); border-bottom:1px solid var(--line-soft);
+  }
+  .tab{
+    flex:1; appearance:none; cursor:pointer; font-family:var(--mono); font-size:11.5px;
+    letter-spacing:.06em; text-transform:uppercase; color:var(--ink-dim);
+    background:transparent; border:1px solid transparent; border-radius:10px;
+    padding:9px 6px 8px; display:flex; align-items:center; justify-content:center; gap:6px;
+    transition:color .18s, background .18s, border-color .18s;
+  }
+  .tab .n{
+    font-size:10px; min-width:17px; height:17px; padding:0 4px; border-radius:999px;
+    background:var(--line); color:var(--ink); display:inline-grid; place-items:center;
+    font-variant-numeric:tabular-nums;
+  }
+  .tab:hover{color:var(--ink)}
+  .tab.on{color:var(--ink); background:rgba(139,123,255,.12); border-color:rgba(139,123,255,.4)}
+  .tab.on .n{background:var(--violet); color:#0a0d16; font-weight:700}
+  .tab:focus-visible{outline:2px solid var(--cyan); outline-offset:2px}
+
+  main{padding:14px 14px 6px}
+  .panel{display:none; animation:fade .25s ease}
+  .panel.on{display:block}
+
+  .lead{font-family:var(--mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase;
+    color:var(--ink-faint); margin:2px 2px 12px; display:flex; align-items:center; gap:8px}
+  .lead .rule{height:1px; flex:1; background:var(--line-soft)}
+
+  /* ---------- draft card ---------- */
+  .card{
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--r);
+    margin-bottom:14px; overflow:hidden; position:relative;
+    transition:transform .3s ease, opacity .3s ease, border-color .2s;
+  }
+  .card::before{content:""; position:absolute; inset:0 0 auto; height:2px;
+    background:linear-gradient(90deg, var(--cyan), var(--violet), var(--magenta)); opacity:.7}
+  .card.go{transform:translateX(120%); opacity:0}
+  .thumb{
+    height:96px; display:flex; align-items:center; gap:10px; padding:0 16px;
+    background:
+      repeating-linear-gradient(135deg, rgba(139,123,255,.05) 0 10px, transparent 10px 20px),
+      radial-gradient(120px 80px at 20% 30%, rgba(47,228,255,.16), transparent),
+      radial-gradient(140px 90px at 90% 80%, rgba(255,92,200,.14), transparent),
+      var(--panel-2);
+    border-bottom:1px solid var(--line-soft); color:var(--ink-dim);
+    font-family:var(--mono); font-size:10.5px; letter-spacing:.03em;
+  }
+  .thumb .ic{width:30px;height:30px;flex:none;border-radius:8px;display:grid;place-items:center;
+    border:1px dashed rgba(139,123,255,.4); color:var(--violet); font-size:15px}
+  .cbody{padding:14px 16px 4px}
+  .ctitle{font-size:15.5px; line-height:1.32; font-weight:600; margin:0 0 9px; color:var(--ink); text-wrap:balance}
+  .meta{display:flex; flex-wrap:wrap; gap:7px; align-items:center; margin-bottom:11px}
+  .chip{font-family:var(--mono); font-size:10px; letter-spacing:.03em; padding:3px 8px; border-radius:999px;
+    border:1px solid var(--line); color:var(--ink-dim); display:inline-flex; align-items:center; gap:4px}
+  .chip.ok{color:var(--lime); border-color:rgba(125,255,176,.32); background:rgba(125,255,176,.06)}
+  .chip.src{color:var(--cyan); border-color:rgba(47,228,255,.26)}
+  .chip.warn{color:var(--amber); border-color:rgba(255,207,107,.28); background:rgba(255,207,107,.05)}
+
+  .plat{margin:0 0 10px}
+  .plabel{font-family:var(--mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--ink-faint); margin:12px 0 6px; display:flex; align-items:center; gap:7px}
+  .plabel .b{width:5px;height:5px;border-radius:50%;background:var(--cyan)}
+  .plabel.vk .b{background:var(--violet)}
+  .post{
+    font-size:13.5px; line-height:1.62; color:#cfd6ea; white-space:pre-wrap;
+    background:var(--well); border:1px solid var(--line-soft); border-radius:var(--r-sm);
+    padding:12px 13px; max-height:118px; overflow:hidden; position:relative; transition:max-height .35s ease;
+  }
+  .post.open{max-height:1600px}
+  .post:not(.open)::after{content:""; position:absolute; left:0;right:0;bottom:0; height:46px;
+    background:linear-gradient(transparent, var(--well)); pointer-events:none}
+  .more{background:none;border:0;cursor:pointer;color:var(--cyan);font-family:var(--mono);
+    font-size:11px;letter-spacing:.04em;padding:7px 2px 2px}
+  .more:hover{color:#8ff0ff}
+
+  .actions{display:flex; flex-wrap:wrap; gap:8px; padding:12px 16px 15px; border-top:1px solid var(--line-soft);
+    margin-top:8px; background:linear-gradient(180deg, transparent, rgba(10,13,22,.5))}
+  .btn{appearance:none; cursor:pointer; font-family:var(--mono); font-size:11.5px; letter-spacing:.03em;
+    border-radius:9px; padding:9px 12px; border:1px solid var(--line); background:var(--panel-2);
+    color:var(--ink-dim); display:inline-flex; align-items:center; gap:6px; transition:.16s}
+  .btn:hover{color:var(--ink); border-color:var(--ink-faint)}
+  .btn:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+  .btn.pub{flex:1; justify-content:center; color:#05210f; font-weight:700;
+    background:linear-gradient(140deg,#7dffb0,#37d98a); border-color:transparent}
+  .btn.pub:hover{filter:brightness(1.08)}
+  .btn.rej:hover{color:var(--red); border-color:rgba(255,107,138,.4)}
+
+  /* ---------- status ---------- */
+  .srow{background:var(--panel); border:1px solid var(--line); border-radius:var(--r); padding:15px 16px; margin-bottom:13px}
+  .srow .st{display:flex; align-items:center; gap:10px; margin-bottom:4px}
+  .badge{font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase;
+    padding:4px 10px; border-radius:999px; font-weight:700}
+  .badge.done{color:#05210f; background:var(--lime)}
+  .badge.off{color:var(--ink-dim); background:var(--line)}
+  .kv{font-family:var(--mono); font-size:12px; color:var(--ink-dim); line-height:1.9; font-variant-numeric:tabular-nums}
+  .kv b{color:var(--ink); font-weight:600}
+  .toggle{margin-left:auto; cursor:pointer; width:46px; height:26px; border-radius:999px; border:1px solid var(--line);
+    background:var(--panel-2); position:relative; transition:.2s; flex:none}
+  .toggle::after{content:""; position:absolute; top:2px; left:2px; width:20px; height:20px; border-radius:50%;
+    background:var(--ink-faint); transition:.2s}
+  .toggle.on{background:rgba(47,228,255,.18); border-color:var(--cyan)}
+  .toggle.on::after{left:22px; background:var(--cyan); box-shadow:0 0 10px var(--cyan)}
+  .bigbtn{width:100%; cursor:pointer; font-family:var(--mono); font-size:12.5px; letter-spacing:.05em;
+    text-transform:uppercase; font-weight:700; padding:14px; border-radius:12px; border:1px solid rgba(255,92,200,.4);
+    color:var(--magenta); background:rgba(255,92,200,.08); transition:.18s; margin-bottom:14px}
+  .bigbtn:hover{background:rgba(255,92,200,.16); color:#ff8bd8}
+  .pipe{display:flex; align-items:center; gap:6px; flex-wrap:wrap; padding:14px 15px; background:var(--panel-2);
+    border:1px solid var(--line-soft); border-radius:var(--r); font-family:var(--mono); font-size:10.5px; color:var(--ink-dim)}
+  .pipe .s{padding:5px 9px; border:1px solid var(--line); border-radius:8px; white-space:nowrap}
+  .pipe .s.hot{color:var(--cyan); border-color:rgba(47,228,255,.4)}
+  .pipe .ar{color:var(--ink-faint)}
+
+  /* ---------- history ---------- */
+  .hitem{display:flex; gap:12px; padding:13px 14px; background:var(--panel); border:1px solid var(--line);
+    border-radius:var(--r); margin-bottom:11px; align-items:flex-start}
+  .hitem .num{font-family:var(--mono); font-size:11px; color:#05210f; background:var(--lime); font-weight:700;
+    border-radius:7px; padding:4px 8px; white-space:nowrap; flex:none}
+  .hitem .num.new{background:var(--cyan)}
+  .htxt{min-width:0}
+  .htxt .t{font-size:13.5px; color:var(--ink); margin-bottom:3px; line-height:1.35}
+  .htxt .m{font-family:var(--mono); font-size:10.5px; color:var(--ink-faint); letter-spacing:.02em}
+  .htxt .m a{color:var(--cyan); text-decoration:none}
+  .empty{text-align:center; color:var(--ink-faint); font-family:var(--mono); font-size:11.5px;
+    padding:26px 10px; border:1px dashed var(--line); border-radius:var(--r)}
+
+  .foot{padding:12px 16px 15px; text-align:center; font-family:var(--mono); font-size:10px;
+    letter-spacing:.04em; color:var(--ink-faint); border-top:1px solid var(--line-soft)}
+
+  /* ---------- toast + modal ---------- */
+  .toast{position:fixed; left:50%; bottom:26px; transform:translate(-50%,140%); z-index:30;
+    max-width:400px; width:calc(100% - 40px); background:#0e1424; border:1px solid var(--line);
+    border-left:3px solid var(--lime); border-radius:12px; padding:13px 15px; font-size:13px; color:var(--ink);
+    box-shadow:0 20px 50px -15px rgba(0,0,0,.8); transition:transform .35s cubic-bezier(.2,.9,.3,1.2)}
+  .toast.show{transform:translate(-50%,0)}
+  .toast.warnbar{border-left-color:var(--amber)}
+  .toast .mono{font-family:var(--mono); font-size:11px; color:var(--ink-dim); display:block; margin-top:3px}
+  .modal{position:fixed; inset:0; z-index:40; background:rgba(4,6,12,.72); backdrop-filter:blur(3px);
+    display:none; align-items:center; justify-content:center; padding:24px}
+  .modal.show{display:flex}
+  .sheet{max-width:380px; width:100%; background:var(--panel); border:1px solid var(--line); border-radius:18px;
+    padding:20px 19px; box-shadow:0 30px 70px -20px #000}
+  .sheet h3{margin:0 0 8px; font-size:16px}
+  .sheet p{margin:0 0 6px; font-size:13.5px; color:var(--ink-dim); line-height:1.5}
+  .sheet .note{font-family:var(--mono); font-size:10.5px; color:var(--amber); background:rgba(255,207,107,.07);
+    border:1px solid rgba(255,207,107,.22); border-radius:8px; padding:8px 10px; margin:10px 0 16px}
+  .sheet .row{display:flex; gap:9px}
+  .sheet .btn{flex:1; justify-content:center; padding:11px}
+  .sheet .go{color:#05210f; font-weight:700; background:linear-gradient(140deg,#7dffb0,#37d98a); border-color:transparent}
+  .sheet .go.danger{background:linear-gradient(140deg,#ff8bad,#ff6b8a)}
+
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="device">
+  <header class="top">
+    <div class="brand">
+      <div class="logo">🏭</div>
+      <div>
+        <h1>Пульт&nbsp;контента</h1>
+        <div class="chan">@pdn152fz_check · «152-ФЗ простыми словами»</div>
+      </div>
+      <span class="live"><span class="dot"></span>завод</span>
+    </div>
+    <div class="proto"><b>ПРОТОТИП</b> · действия макетные — реально ничего не публикует</div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab on" data-tab="queue">Очередь <span class="n" id="qn">3</span></button>
+    <button class="tab" data-tab="status">Статус</button>
+    <button class="tab" data-tab="history">История <span class="n" id="hn">2</span></button>
+  </nav>
+
+  <main>
+    <!-- QUEUE -->
+    <section class="panel on" id="queue">
+      <div class="lead">Черновики ждут апрува <span class="rule"></span></div>
+      <div id="cards"></div>
+      <div id="qempty" class="empty" style="display:none">Очередь пуста.<br>Новый черновик кладёт завод по расписанию (Пн/Чт 09:00) или по кнопке «Заказать» во вкладке Статус.</div>
+    </section>
+
+    <!-- STATUS -->
+    <section class="panel" id="status">
+      <div class="lead">Завод · последний прогон <span class="rule"></span></div>
+      <div class="srow">
+        <div class="st"><span class="badge done">готово</span><span class="toggle on" id="tgTask" title="задача расписания"></span></div>
+        <div class="kv">
+          прогон <b>07-16 01:18 → 01:30</b> (12м 7с)<br>
+          результат <b>+1 черновик</b> · трансгранич-передача<br>
+          режим <b>claude --agent</b> · rc <b>0</b><br>
+          расписание <b id="schState">Пн/Чт 09:00 · вкл</b>
+        </div>
+      </div>
+      <button class="bigbtn" id="orderBtn">⚡ Заказать черновик сейчас</button>
+      <div class="lead">Конвейер <span class="rule"></span></div>
+      <div class="pipe">
+        <span class="s">повестка</span><span class="ar">→</span>
+        <span class="s">верификация</span><span class="ar">→</span>
+        <span class="s">JSON TG/VK</span><span class="ar">→</span>
+        <span class="s">картинка</span><span class="ar">→</span>
+        <span class="s hot">очередь</span><span class="ar">→</span>
+        <span class="s">🔒 апрув</span>
+      </div>
+    </section>
+
+    <!-- HISTORY -->
+    <section class="panel" id="history">
+      <div class="lead">Опубликовано <span class="rule"></span></div>
+      <div id="hlist"></div>
+      <div class="lead" style="margin-top:18px">Отклонено <span class="rule"></span></div>
+      <div id="rlist"><div class="empty">Отклонённых нет.</div></div>
+    </section>
+  </main>
+
+  <footer class="foot">пульт-мини-ап · v0 прототип · человек-гейт не убирается</footer>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="modal" id="modal">
+  <div class="sheet">
+    <h3 id="mTitle"></h3>
+    <p id="mText"></p>
+    <div class="note" id="mNote"></div>
+    <div class="row">
+      <button class="btn" id="mCancel">Отмена</button>
+      <button class="btn go" id="mOk">Ок</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var drafts = [
+    { slug:"utechka", title:"Утечка ПДн: у вас 24 часа, чтобы уведомить РКН",
+      src:"rg.ru", date:"14.07.2026", facts:5,
+      tg:"🤔 Если у вас произошла утечка персональных данных — паника и молчание хуже всего. На этой неделе «Российская газета» снова напомнила: скрывать инцидент от Роскомнадзора — самая дорогая ошибка.\n\nЧто важно знать:\n\n1. По ст. 21 152-ФЗ у оператора есть 24 часа с момента обнаружения утечки, чтобы уведомить РКН — о самом факте, вероятных причинах и принятых мерах. Ещё 72 часа даётся на отчёт о результатах внутреннего расследования.\n\n2. Сама утечка — законное основание для внеплановой проверки РКН. О визите инспектора предупредят всего за 24 часа.\n\n3. Попытку скрыть или затянуть уведомление РКН расценивает как недобросовестность.\n\n4. Но есть и обнадёживающий пример: суд Кемеровской области в январе 2026 (дело №А27-27136/2025) заменил штраф на предупреждение — компания уложилась в 24 часа, нарушение первое, вреда людям не было. По ч. 1 ст. 13.11 КоАП штраф мог быть 150–300 тыс. ₽.\n\nОт утечек не застрахован никто. Но то, как вы действуете в первые часы, реально влияет на итог. 😉\n\n🔎 Бесплатная самопроверка по 152-ФЗ: pdn-compliance-os.onrender.com",
+      vk:"Если завтра к вам в базу залезет хакер — то, что вы сделаете в первые 24 часа, решит очень многое. 🤔\n\nСвежий разбор «Российской газеты» (14 июля 2026) напомнил: скрывать утечку от Роскомнадзора — худшая тактика. По ст. 21 152-ФЗ у оператора есть 24 часа, чтобы уведомить РКН, и ещё 72 часа — на отчёт о расследовании…\n\n#152ФЗ #персональныеданные #РКН #бизнес #утечкаданных" },
+    { slug:"transgran", title:"Госдума ужесточила правила трансграничной передачи данных",
+      src:"rapsinews.ru", date:"08.07.2026", facts:4, warn:"законопроект",
+      tg:"🤔 Отправляете данные клиентов в зарубежный сервис — CRM, рассылку, аналитику, облако? Это трансграничная передача ПДн (ст. 12 152-ФЗ), и 8 июля 2026 Госдума в третьем чтении ужесточила правила её оценки.\n\nЧто поменялось:\n\n1. Раньше страна считалась «безопасной», если формально присоединилась к Конвенции Совета Европы 1981 года. Теперь одного членства мало — РКН смотрит, реально ли там защищают данные на практике.\n\n2. Список стран с «адекватной защитой» ведёт РКН — по новым критериям состав может пересматриваться.\n\n3. Базовая обязанность прежняя: до начала передачи оператор уведомляет РКН (ст. 12 ч. 3); ведомство рассматривает 10 рабочих дней и вправе запретить.\n\n4. Закон пока не подписан президентом — принято только 3-е чтение (законопроект № 951518-8). Направление ясно: контроль будет жёстче.\n\nЧто сделать сейчас: выпишите все зарубежные сервисы, куда уходят данные клиентов, и проверьте — подавали ли уведомление в РКН.\n\n🔎 Самопроверка по 152-ФЗ: pdn-compliance-os.onrender.com",
+      vk:"Если бизнес использует зарубежную CRM, рассылку или облако — вы, возможно, уже проводите трансграничную передачу ПДн. И правила её оценки только что стали строже. 🤔\n\n8 июля 2026 Госдума в 3-м чтении приняла поправки в ст. 12 152-ФЗ (законопроект № 951518-8)…\n\n#152ФЗ #персональныеданные #РКН #трансграничнаяпередача" },
+    { slug:"rknbot", title:"РКН запустил автоматический бот, который сам сканирует сайты",
+      src:"habr.com", date:"29.04.2026", facts:4,
+      tg:"🤔 Если на вашем сайте есть форма «оставить заявку», виджет чата или счётчик Яндекс.Метрики — за ним теперь может следить не только человек, а автоматический бот Роскомнадзора.\n\n1. Раньше нарушения находили по жалобам и публикациям в СМИ. С января 2025 Минцифры готовило проект, дающий РКН право на автоматизированный контроль. Весной 2026 юристы фиксируют: система работает и сверяет сайты с реестром операторов.\n\n2. Под проверку попадают обычные элементы: формы, подписка, личный кабинет, cookie-баннер, счётчики аналитики, фото сотрудников, отзывы.\n\n3. Нет компании в реестре — это неуведомление (ч.10 ст. 13.11: 100–300 тыс. ₽). Обработка без оснований — 150–300 тыс. (ч.1), без согласия — 300–700 тыс. (ч.2).\n\n4. На исправление после предписания дают ~10 рабочих дней.\n\nСайту всё равно, кто его читает — инспектор или бот. Проверить формы стоит уже сейчас. 😉\n\n🔎 Самопроверка по 152-ФЗ: pdn-compliance-os.onrender.com",
+      vk:"Роскомнадзор больше не ждёт жалоб, чтобы найти нарушение 152-ФЗ на сайте — теперь это делает автоматический бот. 🤔\n\nПравовую базу готовили с января 2025; весной 2026 юристы подтвердили: система сверяет сайты с реестром операторов…\n\n#152ФЗ #персональныеданные #РКН #проверкасайта" }
+  ];
+
+  var published = [
+    { id:15, t:"Уведомление в РКН «до 15-го числа» (ст. 22 ч. 7 152-ФЗ)", m:"07-15 · gpt-image · t.me/pdn152fz_check/15" },
+    { id:17, t:"Штрафы за авторизацию через иностранные сервисы (ст. 13.55 КоАП)", m:"07-15 · Recraft · опубликовано кнопкой пульта" }
+  ];
+  var rejected = [];
+
+  var $ = function(s){return document.querySelector(s)};
+  var cards=$("#cards"), qn=$("#qn"), hn=$("#hn"), qempty=$("#qempty");
+
+  function esc(s){return s.replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]})}
+
+  function renderQueue(){
+    cards.innerHTML="";
+    drafts.forEach(function(d){
+      var el=document.createElement("div");
+      el.className="card"; el.dataset.slug=d.slug;
+      el.innerHTML=
+        '<div class="thumb"><span class="ic">🖼</span>картинка — по промпту, не собрана</div>'+
+        '<div class="cbody">'+
+          '<h2 class="ctitle">'+esc(d.title)+'</h2>'+
+          '<div class="meta">'+
+            '<span class="chip ok">✔ проверено ×'+d.facts+'</span>'+
+            '<span class="chip src">'+d.src+' · '+d.date+'</span>'+
+            (d.warn?'<span class="chip warn">⚠ '+d.warn+'</span>':'')+
+          '</div>'+
+          '<div class="plabel"><span class="b"></span>Telegram — опубликуется</div>'+
+          '<div class="post">'+esc(d.tg)+'</div>'+
+          '<button class="more" data-a="more">Развернуть · показать VK</button>'+
+          '<div class="plat vk" style="display:none">'+
+            '<div class="plabel vk"><span class="b"></span>VK — копируется вручную</div>'+
+            '<div class="post open">'+esc(d.vk)+'</div>'+
+          '</div>'+
+        '</div>'+
+        '<div class="actions">'+
+          '<button class="btn pub" data-a="pub">✅ Одобрить · опубликовать в TG</button>'+
+          '<button class="btn" data-a="img" title="пересобрать картинку">🖼</button>'+
+          '<button class="btn" data-a="edit" title="править текст">✎</button>'+
+          '<button class="btn rej" data-a="rej" title="отклонить">🗑</button>'+
+        '</div>';
+      cards.appendChild(el);
+    });
+    qn.textContent=drafts.length;
+    qempty.style.display = drafts.length? "none":"block";
+  }
+
+  function renderHistory(){
+    var h=$("#hlist");
+    h.innerHTML = published.map(function(p){
+      return '<div class="hitem"><span class="num'+(p.fresh?' new':'')+'">msg '+p.id+'</span>'+
+        '<div class="htxt"><div class="t">'+esc(p.t)+'</div><div class="m">'+esc(p.m)+'</div></div></div>';
+    }).join("");
+    var r=$("#rlist");
+    r.innerHTML = rejected.length ? rejected.map(function(x){
+      return '<div class="hitem"><span class="num" style="background:var(--line);color:var(--ink-dim)">🗑</span>'+
+        '<div class="htxt"><div class="t">'+esc(x.title)+'</div><div class="m">отклонён · только что</div></div></div>';
+    }).join("") : '<div class="empty">Отклонённых нет.</div>';
+    hn.textContent=published.length;
+  }
+
+  // toast
+  var toast=$("#toast"), tt;
+  function say(html, warn){
+    toast.innerHTML=html; toast.className="toast show"+(warn?" warnbar":"");
+    clearTimeout(tt); tt=setTimeout(function(){toast.className="toast"+(warn?" warnbar":"")},3400);
+  }
+
+  // modal
+  var modal=$("#modal"), pending=null;
+  function ask(o){
+    pending=o.onOk;
+    $("#mTitle").textContent=o.title; $("#mText").textContent=o.text; $("#mNote").textContent=o.note;
+    $("#mOk").textContent=o.ok; $("#mOk").className="btn go"+(o.danger?" danger":"");
+    modal.className="modal show";
+  }
+  $("#mCancel").onclick=function(){modal.className="modal"; pending=null};
+  $("#mOk").onclick=function(){var f=pending; modal.className="modal"; pending=null; if(f)f()};
+  modal.onclick=function(e){if(e.target===modal){modal.className="modal"; pending=null}};
+
+  function removeCard(slug, after){
+    var el=cards.querySelector('[data-slug="'+slug+'"]');
+    if(!el){after&&after();return}
+    el.classList.add("go");
+    setTimeout(function(){ drafts=drafts.filter(function(d){return d.slug!==slug}); renderQueue(); after&&after(); },300);
+  }
+
+  // card interactions (delegated)
+  cards.addEventListener("click", function(e){
+    var b=e.target.closest("[data-a]"); if(!b) return;
+    var card=e.target.closest(".card"), slug=card.dataset.slug;
+    var d=drafts.filter(function(x){return x.slug===slug})[0]; if(!d) return;
+    var a=b.dataset.a;
+    if(a==="more"){
+      var post=card.querySelector(".post"), vk=card.querySelector(".plat");
+      var opened=post.classList.toggle("open");
+      vk.style.display=opened?"block":"none";
+      b.textContent=opened?"Свернуть":"Развернуть · показать VK";
+    } else if(a==="pub"){
+      ask({title:"Опубликовать в @pdn152fz_check?", text:"«"+d.title+"» уйдёт в боевой канал в Telegram.",
+        note:"ПРОТОТИП: реальной публикации не будет — это макет пульта.", ok:"✅ Опубликовать",
+        onOk:function(){
+          var id=18+published.length-2+1; // demo id after 17
+          removeCard(slug, function(){
+            published.unshift({id:id, t:d.title, m:"только что · макет-публикация", fresh:true});
+            renderHistory();
+          });
+          say("✅ <b>Макет:</b> опубликовано в Telegram, message_id "+id+"<span class='mono'>черновик ушёл в Историю · в бою публикует publish_telegram.py</span>");
+        }});
+    } else if(a==="rej"){
+      ask({title:"Отклонить черновик?", text:"«"+d.title+"» уйдёт в rejected/.",
+        note:"ПРОТОТИП: перемещение только в макете.", ok:"🗑 Отклонить", danger:true,
+        onOk:function(){ removeCard(slug, function(){ rejected.unshift({title:d.title}); }); say("🗑 Черновик отклонён — убран из очереди.", true); }});
+    } else if(a==="img"){
+      say("🖼 <b>Макет:</b> пересборка картинки<span class='mono'>в бою: make_image.py по image_prompt (gpt-image / Recraft)</span>", true);
+    } else if(a==="edit"){
+      say("✎ <b>Макет:</b> правка текста<span class='mono'>в v1 — инлайн-редактор поля TG/VK перед апрувом</span>", true);
+    }
+  });
+
+  // tabs
+  document.querySelectorAll(".tab").forEach(function(t){
+    t.onclick=function(){
+      document.querySelectorAll(".tab").forEach(function(x){x.classList.remove("on")});
+      document.querySelectorAll(".panel").forEach(function(x){x.classList.remove("on")});
+      t.classList.add("on"); $("#"+t.dataset.tab).classList.add("on");
+    };
+  });
+
+  // status controls
+  var taskOn=true;
+  $("#tgTask").onclick=function(){
+    taskOn=!taskOn; this.classList.toggle("on",taskOn);
+    $("#schState").textContent="Пн/Чт 09:00 · "+(taskOn?"вкл":"выкл");
+    document.querySelector(".badge").className="badge "+(taskOn?"done":"off");
+    document.querySelector(".badge").textContent=taskOn?"готово":"выкл";
+    say((taskOn?"▶️":"⏸")+" <b>Макет:</b> задача расписания "+(taskOn?"включена":"выключена")+"<span class='mono'>в бою: Enable/Disable-ScheduledTask PDN_ContentFactory_Draft</span>", true);
+  };
+  $("#orderBtn").onclick=function(){
+    say("⚡ <b>Макет:</b> завод запущен — новый черновик появится в очереди через ~12 мин<span class='mono'>в бою: content_factory_run.py (claude --agent content-factory)</span>", true);
+  };
+
+  renderQueue(); renderHistory();
+})();
+</script>
