@@ -266,5 +266,14 @@ def reject():
     return redirect(url_for("index", msg="Черновик отклонён (в rejected/): " + slug))
 
 
+def _open_browser():
+    """Открыть пульт в браузере, когда сервер уже поднялся (владелец не набирает адрес руками)."""
+    import threading, webbrowser
+    threading.Timer(1.5, lambda: webbrowser.open("http://127.0.0.1:5055")).start()
+
+
 if __name__ == "__main__":
+    print("Пульт апрува: http://127.0.0.1:5055   (закрыть — Ctrl+C в этом окне)")
+    if "--no-browser" not in sys.argv:
+        _open_browser()
     app.run(host="127.0.0.1", port=5055, debug=False, use_reloader=False)
