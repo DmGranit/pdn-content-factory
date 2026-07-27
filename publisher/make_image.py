@@ -24,9 +24,12 @@ import urllib.request
 import urllib.error
 
 # Источники ключа (по порядку): опциональный секрет-брокер (env CF_VAULT) -> .env проекта.
-VAULT = os.environ.get("CF_VAULT", "")
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
+sys.path.insert(0, ROOT)
+import cf_env  # noqa: F401  — .env проекта -> окружение (в т.ч. CF_VAULT)
+
+VAULT = os.environ.get("CF_VAULT", "")
 
 
 def load_vault(secret_id, env_name):
