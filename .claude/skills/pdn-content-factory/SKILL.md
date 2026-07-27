@@ -35,7 +35,9 @@ description: Контент-завод канала «152-ФЗ простыми 
 ```json
 {
   "schema_version": "social-content/v1",
-  "source": { "title": "...", "url": "https://...", "published_at": "YYYY-MM-DD" },
+  "source": { "title": "...", "url": "https://...", "published_at": "YYYY-MM-DD", "publisher": "РКН / КонсультантПлюс / ..." },
+  "rubric": "Цена вопроса",
+  "site_summary": "2–3 предложения сухо и по делу, без эмодзи и без CTA — карточка для новостной ленты сайта.",
   "image_prompt": "English description, no text on image",
   "image_url": null,
   "platforms": {
@@ -45,6 +47,7 @@ description: Контент-завод канала «152-ФЗ простыми 
 }
 ```
 Каждая площадка — объект с обязательным строковым полем `content`. `image_url` = null (впишется после генерации картинки).
+`rubric` — угол подачи из ближайшего слота `schedule.json`; `site_summary` — текст для ленты сайта (не копия начала поста, а пересказ сути).
 
 ## Базовый стиль
 Тёплый, прямой, практичный. Крючок с эмодзи и вопросом/фактом. Короткие абзацы или нумерованные пункты.
