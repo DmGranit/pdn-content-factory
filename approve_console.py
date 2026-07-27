@@ -266,14 +266,37 @@ def reject():
     return redirect(url_for("index", msg="Черновик отклонён (в rejected/): " + slug))
 
 
+URL = "http://127.0.0.1:5055"
+
+
 def _open_browser():
     """Открыть пульт в браузере, когда сервер уже поднялся (владелец не набирает адрес руками)."""
     import threading, webbrowser
-    threading.Timer(1.5, lambda: webbrowser.open("http://127.0.0.1:5055")).start()
+    threading.Timer(1.5, lambda: webbrowser.open(URL)).start()
+
+
+def _port_busy():
+    """Занят ли порт. Ловим случай «пульт уже запущен старой версией» — иначе новый процесс
+    умирает молча, а браузер открывает СТАРУЮ страницу, и владелец видит вчерашний интерфейс.
+    Поймано на живом сбое 2026-07-27."""
+    import socket
+    with socket.socket() as s:
+        s.settimeout(0.4)
+        return s.connect_ex(("127.0.0.1", 5055)) == 0
 
 
 if __name__ == "__main__":
-    print("Пульт апрува: http://127.0.0.1:5055   (закрыть — Ctrl+C в этом окне)")
+    if _port_busy():
+        print("\n" + "=" * 64)
+        print("  ПУЛЬТ УЖЕ ЗАПУЩЕН в другом окне — второй раз не поднимаю.")
+        print("  Если интерфейс выглядит устаревшим: закрой ТО окно (Ctrl+C)")
+        print("  и запусти пульт заново — иначе браузер показывает старую версию.")
+        print("  Адрес: " + URL)
+        print("=" * 64 + "\n")
+        if "--no-browser" not in sys.argv:
+            _open_browser()
+        sys.exit(0)
+    print("Пульт апрува: " + URL + "   (закрыть — Ctrl+C в этом окне)")
     if "--no-browser" not in sys.argv:
         _open_browser()
     app.run(host="127.0.0.1", port=5055, debug=False, use_reloader=False)
